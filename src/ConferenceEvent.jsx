@@ -51,19 +51,69 @@ const ConferenceEvent = () => {
     //     dispatch(toggleMealSelection(index, newNumberOfPeople));
     // }
     // else {
-        dispatch(toggleMealSelection(index));
+    dispatch(toggleMealSelection(index));
     // }
   };
 
   const getItemsFromTotalCost = () => {
     const items = [];
-  };
+
+    venueItems.forEach((item) => {
+      if (item.quantity > 0) {
+        items.push({ ...item, type: "venue" });
+      }
+    });
+
+    avItems.forEach((item) => {
+      if (item.quantity > 0) {
+        items.push({ ...item, type: "av" });
+      }
+    });
+
+    mealsItems.forEach((item) => {
+      if (item.selected) {
+        items.push({ ...item, type: "meals", quantity: numberOfPeople });
+      }
+    });
+
+    return items;
+  }
 
   const items = getItemsFromTotalCost();
 
   const ItemsDisplay = ({ items }) => {
+    console.log(items);
+    return (
+      <div className="display_box1">
+        {items.length === 0 && <p>No items selected</p>}
+        <table className="table_item_data">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Unit Cost</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, index) => (
+              <tr key={index}>
+                <td>{item.name}</td>
+                <td>${item.cost}</td>
+                <td>
+                  {item.type === "meals" || item.numberOfPeople
+                    ? ` For ${numberOfPeople} people`
+                    : item.quantity}
+                </td>
+                <td>${item.cost * item.quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
-  };
   const calculateTotalCost = (section) => {
     let totalCost = 0;
     if (section === "venue") {
@@ -87,6 +137,12 @@ const ConferenceEvent = () => {
   const venueTotalCost = calculateTotalCost("venue");
   const avTotalCost = calculateTotalCost("av");
   const mealsTotalCost = calculateTotalCost("meals");
+
+  const totalCosts = {
+    venue: venueTotalCost,
+    av: avTotalCost,
+    meals: mealsTotalCost,
+  }
 
   const navigateToProducts = (idType) => {
     if (idType == '#venue' || idType == '#addons' || idType == '#meals') {
